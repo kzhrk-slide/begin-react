@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>たてよこWebアワードに応募してみた</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <style type="text/css">
+      @import url(https://fonts.googleapis.com/css?family=Yanone+Kaffeesatz);
+      @import url(https://fonts.googleapis.com/css?family=Droid+Serif:400,700,400italic);
+      @import url(https://fonts.googleapis.com/css?family=Ubuntu+Mono:400,700,400italic);
+
+      body { font-family: 'Droid Serif', 'YuGothic', 'Arial', serif; }
+      h1, h2, h3, h4 {
+        font-weight: normal;
+        color: #c18100;
+        line-height: 1;
+      }
+      a,
+      a:link,
+      a:visited {
+        color: #825700;
+      }
+      li {
+        margin-top: 5px;
+      }
+      li:first-child {
+        margin-top: 0;
+      }
+      ul ul {
+        margin-top: 5px;
+      }
+      .remark-code, .remark-inline-code { font-family: 'Ubuntu Mono'; }
+      .big {
+        font-size: 150px;
+      }
+      code.text {
+        white-space: normal;
+      }
+      pre {
+        padding: 1em;
+        background-color: #eee;
+      }
+      table {
+        width: 100%;
+      }
+      th {
+        padding: 0.5em;
+        background-color: #ffdbb6;
+      }
+      td {
+        padding: 0.5em;
+        background-color: #fff7e7;
+      }
+      tr {
+        background-color: #eee;
+      }
+      .w100 img {
+        width: 100%;
+      }
+      .del {
+        text-decoration: line-through;
+      }
+    </style>
+  </head>
+  <body>
+    <textarea id="source">
+
+
+      class: center, middle
+
+      # たてよこWebアワードに<br>応募してみた
+
+      2017/03/15
+
+      Kobayashi Kazuhiro (kzhrk)
+
+
+      ---
+
+
+      ## Agenda
+
+      - たてよこWebアワードとは
+      - 使用技術
+      - writing-mode
+      - React.js
+      - せんりうの今後
+
+
+      ---
+      class: center, middle
+
+
+      # たてよこWebアワードとは
+
+
+      ---
+
+
+      ## たてよこWebアワードとは
+
+      ```text
+      たてよこWebアワードは、CSSの新たな組版規格を使用し次世代のWebタイポグラフィに挑戦したデザインや取り組みを表彰するためのアワードです。
+      ```
+
+      テキストの行のレイアウトを水平または垂直に、ブロックの流れる方向を左向きまたは右向きに定義するCSSのwriting-modeプロパティを使って縦書きを表現する。
+
+
+      ---
+
+
+      ## 応募してみた
+
+      .w100[![せんりう](/img/senriu.png)]
+
+      http://senriu.com/
+
+
+      ---
+      class: center, middle
+
+
+      # 使用技術
+
+
+      ---
+      class: center, middle
+
+
+      .w100[![](/img/figure.png)]
+
+
+      ---
+
+
+      ## nginx
+
+      express.jsでPort 3000にHTTP Serverを立てて、nginxのupstreamでPort 80に向ける。
+
+      ```
+      upstream tateyoko {
+        server localhost:3000;
+      }
+
+      server {
+
+        ...
+
+        location / {
+          proxy_pass http://tateyoko/;
+        }
+
+        ...
+
+      }
+      ```
+
+
+      ---
+
+
+      ## MongoDB
+
+      ODM（Object Document Mapper）はmongoose。
+
+      mongooseの拡張プラグインは特に使用せず。
+
+      Modelは2つだけ。
+
+
+      ---
+
+
+      ## express
+
+      RESTful APIを実装。
+
+      ```js
+      const apiRouter = express.Router();
+
+      apiRouter.route('/senriu')
+        .post((req, res)=>{
+          ...
+        })
+        .get((req, res)=>{
+          ...
+        })
+        .delete((req, res)=>{
+          ...
+        });
+      ```
+
+      ???
+
+      method-overrideを使ってqueryパラメータでdelete実装。
+
+      superagentに.del()メソッドあったのでmethod-override不要…
+
+
+      ---
+
+
+      ## React.js
+
+      facebookがつくったViewModelなフレームワーク。
+
+      Virtual DOM（仮想DOM）が特徴。
+
+
+      ---
+
+
+      ## PostCss
+
+      CSSを作成するためのフレームワーク。
+
+      PostCss Pluginsのprecssを読み込めばsass likeなcssが書ける💪💪💪
+
+      --
+
+      => node-sassを使うべきでは🤔
+
+
+      ---
+
+
+      ## 使用したPostCss Plugins
+
+      | Plugin | Description |
+      |---|---|
+      | autoprefixer | Can I Useのデータを元にvendor prefixをつける |
+      | postcss-import | sassの@import |
+      | postcss-custom-media | @custom-media |
+
+
+      ---
+
+
+      ## Webpack
+
+      css-loaderでCSS Scope（:local）をやった。
+
+      ```js
+      export default {
+
+        ...
+
+        module: {
+          loaders: [{
+            test: /\.css$/,
+            loader: 'style!css!postcss'
+          }]
+        }
+
+        ...
+
+      }
+      ```
+
+
+      ---
+
+
+      ## CSS Scope
+
+      WebpackでrequireするCSSファイル内で、クラスセレクタの前に:localを追加するとhash化されたクラスセレクタに変換される。
+
+      ```css
+      :local .className { background: red; }
+      :local .className { color: green; }
+      :local .className .subClass { color: green; }
+      ```
+
+      ```css
+      ._23_aKvs-b8bW2Vg3fwHozO { background: red; }
+      ._23_aKvs-b8bW2Vg3fwHozO { color: green; }
+      ._23_aKvs-b8bW2Vg3fwHozO ._13LGdX8RMStbBE9w-t0gZ1 { color: green; }
+      ```
+
+
+      ---
+
+
+      ## CSS Scopeの所感
+
+      つらい。
+
+      --
+
+      ロクに設計しなかったのでだいぶつらい。
+
+      postcsssのネスト系プラグインを一切入れなかったのでとてもつらい。
+
+      .center[↓]
+
+      --
+
+      BEMやディレクトリ構造レベルのルールは最低限必要。
+
+      CSS設計思想からは逃げられない。
+
+      変なこだわりを持たずにpostcssであればpostcss-nesting|postcss-nested、もしくはnode-sassを使うべき。
+
+
+      ---
+
+
+      ## writing-mode
+
+      テキストの行のレイアウトを水平または垂直に、ブロックの流れる方向を左向きまたは右向きに定義するプロパティ。
+
+      ブロックレベルのコンテナが積み上がる方向、ブロックコンテナ内でインラインレベルコンテンツが流れる方向も定義されるのでレイアウト構造を考えずに無闇にラッパーとなっているHTML要素に定義すると痛い目に遭う（遭った）。
+
+      ???
+
+      テキストの方向とインラインレベルコンテンツの方向を定義するのに留めるのが無難。ブロックレベルのコンテナの積み上げは従来通りのレイアウト方向で行うべき。
+
+
+      ---
+
+
+      ## writing-mode
+
+      各種ブラウザサポート状況: http://caniuse.com/#search=writing-mode
+
+      だいたいverndor prefixが必要なのでautoprefixer使いましょう。
+
+
+      ---
+
+
+      ## バグ報告
+
+      Chromeで縦書き要素にpaddingをつけるとX軸のpositionがズレる。
+
+      widthとheightの指定であれば問題ない。
+
+      <iframe height='265' scrolling='no' title='writing-mode bug - position-x' src='//codepen.io/kzhrk/embed/bqVVQP/?height=265&theme-id=0&default-tab=css,result&embed-version=2' frameborder='no' allowtransparency='true' allowfullscreen='true' style='width: 100%;'>See the Pen <a href='https://codepen.io/kzhrk/pen/bqVVQP/'>writing-mode bug - position-x</a> by Kobayashi Kazuhiro (<a href='http://codepen.io/kzhrk'>@kzhrk</a>) on <a href='http://codepen.io'>CodePen</a>.</iframe>
+
+
+      ---
+
+
+      ## バグ報告
+
+      position: absolute;と左右のpaddingをもつ親要素の内部で要素をfloatさせ、float要素の中で縦書き要素をつくるとFirefoxとChromeでバグる。
+      Firefoxではpaddingが無視される。
+      Chromeでは縦書き要素内のテキストが、横書きになった状態で要素が配置される。開発ツールでfloatを外してつけると直る。
+
+      <iframe height='265' scrolling='no' title='writing-mode bug - width' src='//codepen.io/kzhrk/embed/RpWrNv/?height=265&theme-id=0&default-tab=css,result&embed-version=2' frameborder='no' allowtransparency='true' allowfullscreen='true' style='width: 100%;'>See the Pen <a href='http://codepen.io/kzhrk/pen/RpWrNv/'>writing-mode bug - width</a> by Kobayashi Kazuhiro (<a href='http://codepen.io/kzhrk'>@kzhrk</a>) on <a href='http://codepen.io'>CodePen</a>.</iframe>
+
+
+      ---
+
+
+      ## バグ報告
+
+      非同期書き出しだとだいたいバグる
+
+
+      ---
+      class: center, middle
+
+      
+      # 結論：バグい😇😇😇
+
+
+      ---
+      class: center, middle
+
+
+      # React.js
+
+
+      ---
+
+
+      ## 大まかなReactの流れ
+
+      - React.createClassで仮想DOMを定義
+
+      - render methodでDOM（仮想DOM）を定義
+
+      - ReactDOMで仮想DOM出力
+
+      - Lifecycleにそってstateとpropを変更
+
+
+      ---
+
+
+      ## State
+
+      component内で変更可能。
+
+      component作成後に定義される。
+
+      component内で扱うデータなどを扱う。
+
+      <!-- TODOリストの項目コンポーネントであればTODOのテキストなど。 -->
+
+      ```js
+      const Component = React.createClass({
+        componentWillMount:()=>{
+          this.setState({
+            stateKey1: "value1",
+            stateKey2: "value2"
+          });
+        },
+        ...
+      ```
+
+
+      ---
+
+
+      ## Prop
+
+      component内で変更しない。
+
+      component作成時に定義される。
+
+      componentの呼び出し元で、外部から変更される値を扱う。
+
+      <!-- TODOリストの項目コンポーネントであれば、完了、編集中といったステータスの管理など。 -->
+
+      ```html
+      <Component propsKey1="value1" propsKey="value2" />
+      ```
+
+
+      ---
+      class: center, middle
+
+
+      # React Lifecycle
+
+      https://facebook.github.io/react/docs/react-component.html
+
+
+      ---
+
+
+      ## React Lifecycle - Mounting
+
+      DOMがrenderingされるまでのlifecycle
+
+      | method | description |
+      |---|---|
+      | constructor() | 最初に呼ばれる。stateの初期化などを行う。 |
+      | componentWillMount() | DOMがrenderされる前に一度呼ばれる。APIから情報取得など。 |
+      | render() | DOMの出力 |
+      | componentDidMount() | DOMがrenderされた後に一度呼ばれる。DOMの操作など。 |
+
+
+      ---
+
+
+      ## React Lifecycle - Updating
+
+      componentのpropsかstateの変更を感知して再レンダリングさせる。
+
+      | method | description |
+      |---|---|
+      | componentWillReceiveProps() | 変更後のPropsを監視して処理を加える。第一引数に変更後のPropsが入る。 |
+      | shouldComponentUpdate() | returnを返すとrenderが行われない。 |
+      | componentWillUpdate() | 変更後のPropsとStateで何かを行う。 |
+      | render() | 再レンダリング。 |
+      | componentDidUpdate() | DOMが再レンダリングされた後に実行される。 |
+
+
+      ---
+
+
+      ## React Lifecycle - Unmounting
+
+      componentが削除されるときに実行される。
+
+      | method | description |
+      |---|---|
+      | componentWillUnmount() | リソースの開放 |
+
+
+      ---
+
+
+      ## react-router
+
+      componentのstate、History APIを管理するライブラリ
+
+      https://github.com/ReactTraining/react-router/blob/v3/docs/Introduction.md
+
+      v4.0.0-beta.7がリリースされているので近々メジャーバージョンアップがありそう。
+
+
+      ---
+
+
+      ## たのしい時期
+
+      APIからデータ取得してsetStateするだけでDOMが出力される。
+
+      フレームワークたのしい。
+
+
+      ---
+
+
+      ## つらい時期
+
+      componentの複雑化。
+
+      component間でのデータのやりとり。
+
+      propを使ったstateのバケツリレー😇😇😇
+
+      ???
+
+      GridColumn => Senriu => Work => ThemeSenriuでVelocity Animationの完了つう位。
+
+
+      ---
+      class: center, middle
+
+
+      # せんりうの今後
+
+
+      ---
+
+
+      ## というか残タスク
+
+      - .del[ChromeのGoogle日本語フォント問題]
+      - IE11対応
+      - レスポンシブ対応
+      - コンポーネントの共通化
+      - Redux導入
+      - サーバサイドJSのwebpack化
+        - Server-Side Rendering
+      - ユーザ登録
+        - JWT対応
+        - favorite機能
+        - 削除機能
+      - react-router v4
+      - webpack v2
+
+      ---
+      class: center, middle
+
+
+      # END
+
+
+    </textarea>
+    <script src="js/remark.min.js" type="text/javascript">
+    </script>
+    <script type="text/javascript">
+      var slideshow = remark.create();
+    </script>
+  </body>
+</html>
