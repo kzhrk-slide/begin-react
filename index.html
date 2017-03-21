@@ -376,7 +376,8 @@
 
       ## 大まかなReactの流れ
 
-      - React.createClassで仮想DOMを定義
+      - React.Componentをextendsして仮想DOMを定義
+        - React.createClassはそのうちなくなる https://facebook.github.io/react/blog/2015/03/10/react-v0.13.html
 
       - render methodでDOM（仮想DOM）を定義
 
@@ -394,13 +395,11 @@
 
       component作成後に定義される。
 
-      component内で扱うデータなどを扱う。
-
-      <!-- TODOリストの項目コンポーネントであればTODOのテキストなど。 -->
+      component内のデータなどを扱う。
 
       ```js
-      const Component = React.createClass({
-        componentWillMount:()=>{
+      class Component extends React.Component {
+        componentWillMount(){
           this.setState({
             stateKey1: "value1",
             stateKey2: "value2"
@@ -421,10 +420,17 @@
 
       componentの呼び出し元で、外部から変更される値を扱う。
 
-      <!-- TODOリストの項目コンポーネントであれば、完了、編集中といったステータスの管理など。 -->
-
       ```html
-      <Component propsKey1="value1" propsKey="value2" />
+      import Component from './Component.jsx';
+
+      class Parent extends React.Component {
+        ...
+        render() {
+          return(
+            <Component propsKey1="value1" propsKey2="value2" />
+          )
+        }
+      };
       ```
 
 
@@ -489,7 +495,9 @@
 
       https://github.com/ReactTraining/react-router/blob/v3/docs/Introduction.md
 
-      v4.0.0-beta.7がリリースされているので近々メジャーバージョンアップがありそう。
+      v4.0.0-beta.7がリリースされているので近々メジャーバージョンアップが.del[ありそう]（3/11にあった）。
+
+      react-router-redux@5もreact-router@4からreact-routerリポジトリ配下での管理になった。
 
 
       ---
@@ -515,7 +523,7 @@
 
       ???
 
-      GridColumn => Senriu => Work => ThemeSenriuでVelocity Animationの完了つう位。
+      GridColumn => Senriu => Work => ThemeSenriuでVelocity Animationの完了を待つ。
 
 
       ---
@@ -534,15 +542,14 @@
       - IE11対応
       - レスポンシブ対応
       - コンポーネントの共通化
-      - Redux導入
-      - サーバサイドJSのwebpack化
-        - Server-Side Rendering
+      - 😇 Redux導入
+      - 💪 Server-Side Rendering
       - ユーザ登録
         - JWT対応
         - favorite機能
         - 削除機能
-      - react-router v4
-      - webpack v2
+      - 💪 react-router v4
+      - 💪 webpack v2
 
       ---
       class: center, middle
